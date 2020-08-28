@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import './App.scss';
 import Form from 'react-bootstrap/Form';
+import api from "./services/api";
 
 
 function App() {
@@ -22,9 +23,17 @@ function App() {
         });
     }
 
+    function sendFile(file) {
+        api.post('upload', file).then(success => {
+            console.log(success)
+        }).catch(error => {
+            console.log(error)
+        })
+    }
+
     return (
-        <div className="App">
-            <Form>
+        <div className="d-flex justify-content-center">
+            <Form className="mt-5">
                 <Form.Group>
                     <Form.File
                         id="image"
@@ -33,6 +42,7 @@ function App() {
                         accept="image/x-png,image/gif,image/jpeg"
                     />
                 </Form.Group>
+                <button type="button" onClick={sendFile}>Enviar</button>
             </Form>
         </div>
     );
