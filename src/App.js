@@ -5,26 +5,20 @@ import api from "./services/api";
 
 
 function App() {
-    const [image, setImage] = useState(null);
-    const [FR, setFR] = useState(new FileReader());
+    const [images, setImages] = useState([1, 2]);
 
-    function readFile() {
+    function sendFile() {
+
+        let formData = new FormData();
         const imagem = document.getElementById("image");
 
         if (!imagem || !imagem.files.length > 0) {
             return null;
         }
-        FR.readAsDataURL(imagem.files[0]);
 
-        FR.addEventListener("load", function (e) {
-            if (e.target && e.target.result) {
-                setImage(e.target.result)
-            }
-        });
-    }
+        formData.set('file', imagem.files[0]);
 
-    function sendFile(file) {
-        api.post('upload', file).then(success => {
+        api.post('upload', formData).then(success => {
             console.log(success)
         }).catch(error => {
             console.log(error)
@@ -32,18 +26,32 @@ function App() {
     }
 
     return (
-        <div className="d-flex justify-content-center">
-            <Form className="mt-5">
-                <Form.Group>
-                    <Form.File
-                        id="image"
-                        label="File image"
-                        onChange={readFile}
-                        accept="image/x-png,image/gif,image/jpeg"
-                    />
-                </Form.Group>
-                <button type="button" onClick={sendFile}>Enviar</button>
-            </Form>
+        <div className="container">
+            <div className="row">
+                <div className="col-12">
+                    <div className="d-flex justify-content-center">
+                        <Form className="mt-5">
+                            <Form.Group>
+                                <Form.File
+                                    id="image"
+                                    label="File image"
+                                    accept="image/x-png,image/gif,image/jpeg"
+                                />
+                            </Form.Group>
+                            <button type="button" onClick={sendFile}>Enviar</button>
+                        </Form>
+                    </div>
+                </div>
+            </div>
+            <div className="row">
+                <div className="col-6">
+                    {
+                        images.map((image, index) => {
+                            return <p key={index}>imagem {index + 1}</p>
+                        })
+                    }
+                </div>
+            </div>
         </div>
     );
 }
