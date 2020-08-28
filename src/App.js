@@ -1,26 +1,41 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, {useState} from 'react';
+import './App.scss';
+import Form from 'react-bootstrap/Form';
+
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    const [image, setImage] = useState(null);
+    const [FR, setFR] = useState(new FileReader());
+
+    function readFile() {
+        const imagem = document.getElementById("image");
+
+        if (!imagem || !imagem.files.length > 0) {
+            return null;
+        }
+        FR.readAsDataURL(imagem.files[0]);
+
+        FR.addEventListener("load", function (e) {
+            if (e.target && e.target.result) {
+                setImage(e.target.result)
+            }
+        });
+    }
+
+    return (
+        <div className="App">
+            <Form>
+                <Form.Group>
+                    <Form.File
+                        id="image"
+                        label="File image"
+                        onChange={readFile}
+                        accept="image/x-png,image/gif,image/jpeg"
+                    />
+                </Form.Group>
+            </Form>
+        </div>
+    );
 }
 
 export default App;
