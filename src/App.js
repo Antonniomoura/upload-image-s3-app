@@ -5,24 +5,48 @@ import api from "./services/api";
 
 function App() {
     const [images, setImages] = useState([]);
+    const [description, setDescription] = useState('');
 
     function sendFile() {
         let formData = new FormData();
         const imagem = document.getElementById("image");
-        const description = document.getElementById("description");
 
-        if (!imagem || !imagem.files.length > 0 || description || description.value) {
+        if (!imagem || !imagem.files.length > 0) {
             return null;
         }
 
         formData.set('file', imagem.files[0]);
-        formData.set('description', description.value);
 
-        api.post('images', formData).then(success => {
-            console.log(success)
+        api.post('upload', formData).then(success => {
+            const {urlKey} = success.data
+            if (urlKey) {
+                sendConfig(urlKey);
+            }
         }).catch(error => {
             console.log(error)
         })
+    }
+
+    function sendConfig(urlKey) {
+        if (!description || !description) {
+            return null;
+        }
+
+        api.post('images', {
+            url: urlKey,
+            description: description
+        }).then(success => {
+            getAllImages()
+            resetForm();
+        }).catch(error => {
+            console.log(error)
+        })
+
+    }
+
+    function resetForm() {
+        setDescription('');
+        document.getElementById("image").value = null;
     }
 
     function getAllImages() {
@@ -33,41 +57,76 @@ function App() {
         })
     }
 
+    function removerImage(id) {
+        api.delete(`images/${id}`).then(success => {
+            getAllImages()
+        }).catch(error => {
+            console.log(error)
+        })
+    }
+
     useEffect(() => {
         getAllImages()
     }, [])
 
-    return (
-        <div className="container">
-            <div className="row">
-                <div className="col-12">
-                    <div className="d-flex justify-content-center">
-                        <Form className="mt-5">
-                            <Form.Group>
-                                <Form.File
-                                    id="image"
-                                    label="File image"
-                                    accept="image/x-png,image/gif,image/jpeg"
-                                />
-                            </Form.Group>
-                            <Form.Group>
-                                <Form.Label>Descrição</Form.Label>
-                                <Form.Control type="text" placeholder="Descrição" id="description"/>
-                            </Form.Group>
-                            <button type="button" onClick={sendFile}>Enviar</button>
-                        </Form>
+    function renderImages() {
+        return <div className="row mt-5">
+            {
+                images.map((image, index) => {
+                    return <div className="col-4" key={index}>
+                        <div className="card p-1">
+                            <img className="card-img-top" src={image.url} alt="Card image cap"/>
+                            <div className="card-body px-0">
+                                <div className="d-flex justify-content-center">
+                                    <h5 className="card-title">{image.description}</h5>
+                                </div>
+                                <p className="card-text">{image.createAt}</p>
+                                <div className="d-flex w-100 justify-content-center">
+                                    <button
+                                        type="button"
+                                        className="btn btn-danger w-75"
+                                        onClick={() => removerImage(image._id)}>
+                                        Remover
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+                })
+            }
+        </div>
+    }
+
+    function renderUploadImage() {
+        return <div className="row renderUploadImage">
+            <div className="col-12">
+                <div className="d-flex justify-content-center">
+                    <Form className="mt-2 ">
+                        <Form.Group>
+                            <Form.Control className="description" type="text" value={description} onChange={event => {
+                                setDescription(event.target.value)
+                            }} placeholder="Descrição" id="description"/>
+                        </Form.Group>
+                        <Form.Group>
+                            <Form.File
+                                id="image"
+                                className="upload"
+                                accept="image/x-png,image/gif,image/jpeg"
+                            />
+                        </Form.Group>
+                        <div className="w-100">
+                            <button type="button" className="w-100 btn btn-primary" onClick={sendFile}>Publicar</button>
+                        </div>
+                    </Form>
                 </div>
             </div>
-            <div className="row">
-                <div className="col-6">
-                    {
-                        images.map((image, index) => {
-                            return <p key={index}>imagem {index + 1}</p>
-                        })
-                    }
-                </div>
-            </div>
+        </div>
+    }
+
+    return (
+        <div className="container App">
+            {renderUploadImage()}
+            {renderImages()}
         </div>
     );
 }
