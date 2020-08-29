@@ -106,7 +106,7 @@ function App() {
     function renderImages() {
         return <div className="row mt-5">
             {
-                images.map((image, index) => {
+                images && images.length > 0 ? images.map((image, index) => {
                     return <div className="col-4" key={index}>
                         <div className="card p-1">
                             <img className="card-img-top" src={image.url} alt="Card image cap"/>
@@ -114,11 +114,10 @@ function App() {
                                 <div className="d-flex justify-content-center">
                                     <h5 className="card-title">{image.description}</h5>
                                 </div>
-                                <p className="card-text">{image.createAt}</p>
                                 <div className="d-flex w-100 justify-content-center">
                                     <button
                                         type="button"
-                                        disabled={loadImage || !description || emptyImage}
+                                        disabled={loadImage}
                                         className="btn btn-danger w-75"
                                         onClick={() => removerImage(image._id)}>
                                         Remover
@@ -127,7 +126,13 @@ function App() {
                             </div>
                         </div>
                     </div>
-                })
+                }) : <div className="col-12">
+                    <div className="card">
+                        <div className="p-5 d-flex justify-content-center">
+                            <p className="m-0 text-white">Sem Imagens</p>
+                        </div>
+                    </div>
+                </div>
             }
         </div>
     }
@@ -136,7 +141,7 @@ function App() {
         return <div className="row renderUploadImage">
             <div className="col-12">
                 <div className="d-flex justify-content-center">
-                    <Form className="mt-2 ">
+                    <Form className="mt-3 ">
                         <Form.Group>
                             <Form.Control className="description" type="text" value={description} onChange={event => {
                                 setDescription(event.target.value)
