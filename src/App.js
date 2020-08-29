@@ -2,10 +2,34 @@ import React, {useEffect, useState} from 'react';
 import './App.scss';
 import Form from 'react-bootstrap/Form';
 import api from "./services/api";
+import {ToastContainer, toast} from 'react-toastify';
 
 function App() {
     const [images, setImages] = useState([]);
     const [description, setDescription] = useState('');
+    const [loadImage, setLoadImage] = useState(false);
+    const [emptyImage, setEmptyImage] = useState(true);
+
+    const errorPage = (errorStatus) => toast.error(errorStatus, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+    });
+
+    const pageSuccess = (successStatus) => toast.success(successStatus, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+    });
+
 
     function sendFile() {
         let formData = new FormData();
@@ -14,6 +38,9 @@ function App() {
         if (!imagem || !imagem.files.length > 0) {
             return null;
         }
+        setLoadImage(true)
+
+        setEmptyImage(false)
 
         formData.set('file', imagem.files[0]);
 
@@ -22,8 +49,10 @@ function App() {
             if (urlKey) {
                 sendConfig(urlKey);
             }
+            setLoadImage(false)
         }).catch(error => {
-            console.log(error)
+            errorPage('Error no upload')
+            setLoadImage(false)
         })
     }
 
@@ -31,15 +60,19 @@ function App() {
         if (!description || !description) {
             return null;
         }
+        setLoadImage(true)
 
         api.post('images', {
             url: urlKey,
             description: description
         }).then(success => {
             getAllImages()
+            pageSuccess('Imagem adicionada')
+            setLoadImage(false)
             resetForm();
         }).catch(error => {
-            console.log(error)
+            errorPage('Error no upload IMG')
+            setLoadImage(false)
         })
 
     }
@@ -53,15 +86,16 @@ function App() {
         api.get('images').then(success => {
             setImages(success.data)
         }).catch(error => {
-            console.log(error)
+            errorPage('Error ao carregar imagens')
         })
     }
 
     function removerImage(id) {
         api.delete(`images/${id}`).then(success => {
             getAllImages()
+            pageSuccess('Imagem removida')
         }).catch(error => {
-            console.log(error)
+            errorPage('Error ao remover')
         })
     }
 
@@ -84,6 +118,7 @@ function App() {
                                 <div className="d-flex w-100 justify-content-center">
                                     <button
                                         type="button"
+                                        disabled={loadImage || !description || emptyImage}
                                         className="btn btn-danger w-75"
                                         onClick={() => removerImage(image._id)}>
                                         Remover
@@ -111,11 +146,18 @@ function App() {
                             <Form.File
                                 id="image"
                                 className="upload"
+                                onChange={() => {
+                                    setEmptyImage(false)
+                                }}
                                 accept="image/x-png,image/gif,image/jpeg"
                             />
                         </Form.Group>
                         <div className="w-100">
-                            <button type="button" className="w-100 btn btn-primary" onClick={sendFile}>Publicar</button>
+                            <button type="button"
+                                    disabled={loadImage || !description || emptyImage}
+                                    className="w-100 btn btn-primary" onClick={sendFile}>
+                                {loadImage ? 'Publicando...' : 'Publicar'}
+                            </button>
                         </div>
                     </Form>
                 </div>
@@ -125,6 +167,7 @@ function App() {
 
     return (
         <div className="container App">
+            <ToastContainer/>
             {renderUploadImage()}
             {renderImages()}
         </div>
