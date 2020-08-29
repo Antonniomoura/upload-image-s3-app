@@ -1,29 +1,41 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import './App.scss';
 import Form from 'react-bootstrap/Form';
 import api from "./services/api";
 
-
 function App() {
-    const [images, setImages] = useState([1, 2]);
+    const [images, setImages] = useState([]);
 
     function sendFile() {
-
         let formData = new FormData();
         const imagem = document.getElementById("image");
+        const description = document.getElementById("description");
 
-        if (!imagem || !imagem.files.length > 0) {
+        if (!imagem || !imagem.files.length > 0 || description || description.value) {
             return null;
         }
 
         formData.set('file', imagem.files[0]);
+        formData.set('description', description.value);
 
-        api.post('upload', formData).then(success => {
+        api.post('images', formData).then(success => {
             console.log(success)
         }).catch(error => {
             console.log(error)
         })
     }
+
+    function getAllImages() {
+        api.get('images').then(success => {
+            setImages(success.data)
+        }).catch(error => {
+            console.log(error)
+        })
+    }
+
+    useEffect(() => {
+        getAllImages()
+    }, [])
 
     return (
         <div className="container">
@@ -37,6 +49,10 @@ function App() {
                                     label="File image"
                                     accept="image/x-png,image/gif,image/jpeg"
                                 />
+                            </Form.Group>
+                            <Form.Group>
+                                <Form.Label>Descrição</Form.Label>
+                                <Form.Control type="text" placeholder="Descrição" id="description"/>
                             </Form.Group>
                             <button type="button" onClick={sendFile}>Enviar</button>
                         </Form>
