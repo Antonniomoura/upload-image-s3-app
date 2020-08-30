@@ -41,6 +41,15 @@ jobs:
         port: ${{ secrets.SSH_PORT }}
         key: ${{ secrets.SSH_KEY }}
         script: cd ~/web/upload-image-s3-app/ && npm install
+
+    - name: Run npm install in aws server
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        port: ${{ secrets.SSH_PORT }}
+        key: ${{ secrets.SSH_KEY }}
+        script: export NODE_ENV=PROD && export URL_PROD=${{ secrets.URL_PROD }}
       
     - name: Restart pm2
       uses: appleboy/ssh-action@master

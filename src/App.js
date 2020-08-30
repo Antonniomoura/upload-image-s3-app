@@ -141,7 +141,7 @@ function App() {
         return <div className="row renderUploadImage">
             <div className="col-12">
                 <div className="d-flex justify-content-center">
-                    <Form className="mt-3 ">
+                    <Form className="mt-3">
                         <Form.Group>
                             <Form.Control className="description" type="text" value={description} onChange={event => {
                                 setDescription(event.target.value)
