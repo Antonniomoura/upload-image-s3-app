@@ -104,10 +104,10 @@ function App() {
     }, [])
 
     function renderImages() {
-        return <div className="row mt-5">
+        return <div className="row mt-3">
             {
                 images && images.length > 0 ? images.map((image, index) => {
-                    return <div className="col-4" key={index}>
+                    return <div className="col-4 mt-2" key={index}>
                         <div className="card p-1">
                             <img className="card-img-top" src={image.url} alt="Card image cap"/>
                             <div className="card-body px-0">
