@@ -139,7 +139,6 @@ function App() {
 
     function renderUploadImage() {
         return <div className="row renderUploadImage">
-            <p>Aula de hoje 22:02</p>
             <div className="col-12">
                 <div className="d-flex justify-content-center">
                     <Form className="mt-3">
