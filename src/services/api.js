@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'http://54.146.159.85/',
+    baseURL: process.env.REACT_APP_HOST,
     headers: {
         code: localStorage.getItem('code'),
     }
