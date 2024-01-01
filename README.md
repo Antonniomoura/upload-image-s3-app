@@ -7,6 +7,7 @@ This makes use of npm packages, so inside the project's root folder `run npm ins
 
 In the project directory, you can run:
 
+
 ### `npm start`
 
 Runs the app in the development mode.<br />
